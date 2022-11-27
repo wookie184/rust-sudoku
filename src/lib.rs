@@ -6,8 +6,6 @@ mod utils;
 pub use self::generator::SudokuGenerator as Generator;
 pub use self::solver::SudokuSolver as Solver;
 
-
-
 #[cfg(test)]
 mod test {
     use std::iter::zip;
@@ -208,10 +206,7 @@ mod test {
         "354186927298743615167952483481527369932614578576398241729865134845231796613479852",
     ];
 
-    use crate::{
-        generator::SudokuGenerator,
-        solver::SudokuSolver,
-    };
+    use crate::{generator::SudokuGenerator, solver::SudokuSolver};
 
     fn sudoku_to_string(grid: &[usize]) -> String {
         return String::from_utf8(grid.iter().map(|c| (*c as f64).log2() as u8 + 48).collect())
