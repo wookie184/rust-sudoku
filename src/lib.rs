@@ -5,6 +5,7 @@ mod utils;
 
 pub use self::generator::SudokuGenerator as Generator;
 pub use self::solver::SudokuSolver as Solver;
+pub use self::utils::{grid_to_string, possible_to_string, string_to_grid};
 
 #[cfg(test)]
 mod test {
@@ -206,26 +207,20 @@ mod test {
         "354186927298743615167952483481527369932614578576398241729865134845231796613479852",
     ];
 
-    use crate::{generator::SudokuGenerator, solver::SudokuSolver};
-
-    fn sudoku_to_string(grid: &[usize]) -> String {
-        return String::from_utf8(grid.iter().map(|c| (*c as f64).log2() as u8 + 48).collect())
-            .unwrap();
-    }
+    use crate::{
+        generator::SudokuGenerator, possible_to_string, solver::SudokuSolver, utils::string_to_grid,
+    };
 
     #[test]
     fn test_solver() {
         let mut solver = SudokuSolver::new();
         for (test_case, solution) in zip(TEST_CASES, TEST_CASES_CORRECT) {
-            let test_grid: Vec<usize> = test_case
-                .chars()
-                .map(|c| c.to_digit(10).unwrap() as usize)
-                .collect();
+            let test_grid: Vec<usize> = string_to_grid(&test_case.to_string()).unwrap();
 
             let possible = solver.grid_to_possible(&test_grid);
             let result = solver.solve(&possible).unwrap();
 
-            assert_eq!(sudoku_to_string(&result), solution);
+            assert_eq!(possible_to_string(&result), solution);
         }
     }
 

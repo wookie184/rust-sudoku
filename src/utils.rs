@@ -25,3 +25,34 @@ impl IterBits for usize {
         BitIter { n: *self }
     }
 }
+
+pub fn string_to_grid(sudoku: &str) -> Result<Vec<usize>, String> {
+    let maybe_numbers: Result<Vec<u32>, String> = sudoku
+        .chars()
+        .map(|c| if ". ".contains(c) { '0' } else { c })
+        .map(|c| {
+            c.to_digit(10)
+                .ok_or_else(|| format!("Invalid character: {}", c))
+        })
+        .collect();
+
+    match maybe_numbers {
+        Ok(numbers) => {
+            if numbers.len() == 81 {
+                Ok(numbers.into_iter().map(|n| n as usize).collect())
+            } else {
+                Err("Not enough characters".to_string())
+            }
+        }
+        Err(error) => Err(error),
+    }
+}
+
+pub fn possible_to_string(grid: &[usize]) -> String {
+    return String::from_utf8(grid.iter().map(|c| (*c as f64).log2() as u8 + 48).collect())
+        .unwrap();
+}
+
+pub fn grid_to_string(grid: &[usize]) -> String {
+    return String::from_utf8(grid.iter().map(|&c| c as u8 + 48).collect()).unwrap();
+}
