@@ -1,5 +1,5 @@
 use clap::{Args, Parser, Subcommand};
-use sudoku::{grid_to_string, possible_to_string, string_to_grid, Generator, Solver};
+use sudoku::{grid_to_string, string_to_grid, Generator, Solver};
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -30,7 +30,9 @@ struct Check {
 }
 
 #[derive(Args)]
-struct Generate {}
+struct Generate {
+    number: Option<usize>,
+}
 
 fn main() {
     let cli = Cli::parse();
@@ -39,30 +41,26 @@ fn main() {
         Commands::Solve(args) => {
             let mut solver = Solver::new();
 
-            let maybe_grid = string_to_grid(&args.sudoku);
-            match maybe_grid {
-                Ok(grid) => {
-                    let possible = solver.grid_to_possible(&grid);
-                    let maybe_solved = solver.solve(&possible);
-
-                    match maybe_solved {
-                        Some(solved) => {
-                            let output = possible_to_string(&solved);
-                            println!("{}", output);
-                        }
-                        None => println!("Not solveable"),
+            match string_to_grid(&args.sudoku) {
+                Ok(grid) => match solver.solve(&grid) {
+                    Some(solved) => {
+                        let output = grid_to_string(&solved);
+                        println!("{}", output);
                     }
-                }
+                    None => println!("Not solveable"),
+                },
                 Err(error) => println!("{}", error),
             }
         }
         Commands::Check(_args) => {
             todo!();
         }
-        Commands::Generate(_args) => {
+        Commands::Generate(args) => {
             let mut generator = Generator::new();
-            let sudoku = generator.generate_sudoku();
-            println!("{}", grid_to_string(&sudoku));
+            for _ in 0..(args.number.unwrap_or(1)) {
+                let sudoku = generator.generate_sudoku();
+                println!("{}", grid_to_string(&sudoku));
+            }
         }
     }
 }

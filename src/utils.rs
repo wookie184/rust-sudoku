@@ -48,11 +48,6 @@ pub fn string_to_grid(sudoku: &str) -> Result<Vec<usize>, String> {
     }
 }
 
-pub fn possible_to_string(grid: &[usize]) -> String {
-    return String::from_utf8(grid.iter().map(|c| (*c as f64).log2() as u8 + 48).collect())
-        .unwrap();
-}
-
 pub fn grid_to_string(grid: &[usize]) -> String {
     return String::from_utf8(grid.iter().map(|&c| c as u8 + 48).collect()).unwrap();
 }

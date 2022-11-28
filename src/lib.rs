@@ -5,7 +5,7 @@ mod utils;
 
 pub use self::generator::SudokuGenerator as Generator;
 pub use self::solver::SudokuSolver as Solver;
-pub use self::utils::{grid_to_string, possible_to_string, string_to_grid};
+pub use self::utils::{grid_to_string, string_to_grid};
 
 #[cfg(test)]
 mod test {
@@ -208,7 +208,7 @@ mod test {
     ];
 
     use crate::{
-        generator::SudokuGenerator, possible_to_string, solver::SudokuSolver, utils::string_to_grid,
+        generator::SudokuGenerator, grid_to_string, solver::SudokuSolver, utils::string_to_grid,
     };
 
     #[test]
@@ -216,11 +216,8 @@ mod test {
         let mut solver = SudokuSolver::new();
         for (test_case, solution) in zip(TEST_CASES, TEST_CASES_CORRECT) {
             let test_grid: Vec<usize> = string_to_grid(&test_case.to_string()).unwrap();
-
-            let possible = solver.grid_to_possible(&test_grid);
-            let result = solver.solve(&possible).unwrap();
-
-            assert_eq!(possible_to_string(&result), solution);
+            let result = solver.solve(&test_grid).unwrap();
+            assert_eq!(grid_to_string(&result), solution);
         }
     }
 
@@ -231,9 +228,7 @@ mod test {
 
         for _ in 1..100 {
             let sudoku = generator.generate_sudoku();
-
-            let possible = solver.grid_to_possible(&sudoku);
-            assert!(solver.is_valid_puzzle(&possible));
+            assert!(solver.is_valid_puzzle(&sudoku));
         }
     }
 
@@ -260,9 +255,7 @@ mod test {
                     continue;
                 }
                 sudoku[i] = 0;
-
-                let possible = solver.grid_to_possible(&sudoku);
-                assert!(!solver.is_valid_puzzle(&possible));
+                assert!(!solver.is_valid_puzzle(&sudoku));
             }
         }
     }

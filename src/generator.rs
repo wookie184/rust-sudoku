@@ -6,7 +6,6 @@ use crate::solver::SudokuSolver;
 
 pub struct SudokuGenerator {
     solver: SudokuSolver,
-    all_possible: Vec<usize>,
     rng: StdRng,
 }
 
@@ -18,11 +17,9 @@ impl Default for SudokuGenerator {
 
 impl SudokuGenerator {
     pub fn new() -> Self {
-        let mut solver = SudokuSolver::new();
-        let all_possible = solver.grid_to_possible(&vec![0; 81]);
+        let solver = SudokuSolver::new();
         Self {
             solver,
-            all_possible,
             rng: StdRng::from_entropy(),
         }
     }
@@ -34,9 +31,7 @@ impl SudokuGenerator {
             sudoku[idx] = 0;
         }
 
-        let possible = self.solver.grid_to_possible(sudoku);
-
-        if self.solver.is_valid_puzzle(&possible) {
+        if self.solver.is_valid_puzzle(sudoku) {
             true
         } else {
             for (&idx, val) in zip(to_remove, saved_values) {
@@ -47,10 +42,7 @@ impl SudokuGenerator {
     }
 
     pub fn generate_sudoku(&mut self) -> Vec<usize> {
-        // Create completed sudoku by solving empty sudoku randomly
-        let solution = self.solver.solve_random(&self.all_possible).unwrap();
-
-        let mut question = self.solver.possible_to_grid(&solution).unwrap();
+        let mut question = self.solver.solve_random(&vec![0; 81]).unwrap();
 
         let mut to_remove: Vec<usize> = (0..81).collect();
         to_remove.shuffle(&mut self.rng);

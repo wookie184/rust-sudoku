@@ -34,7 +34,7 @@ impl SudokuSolver {
         }
     }
 
-    pub fn grid_to_possible(&mut self, grid: &[usize]) -> Vec<usize> {
+    fn possible_from_grid(&mut self, grid: &[usize]) -> Vec<usize> {
         let mut possible = vec![ALL_POSSIBLE; 81];
         for (i, &cell) in grid.iter().enumerate() {
             if cell != 0 {
@@ -44,7 +44,8 @@ impl SudokuSolver {
         possible
     }
 
-    pub fn grid_to_possible_fast(&self, grid: &[usize]) -> Vec<usize> {
+    #[allow(dead_code)]
+    fn possible_from_grid_fast(&self, grid: &[usize]) -> Vec<usize> {
         let mut possible = Vec::with_capacity(81);
         for i in 0..81 {
             if grid[i] == 0 {
@@ -69,18 +70,17 @@ impl SudokuSolver {
         possible
     }
 
-    pub fn possible_to_grid(&self, possible: &Vec<usize>) -> Option<Vec<usize>> {
-        for &n in possible {
-            if !n.is_power_of_two() {
-                return None;
-            }
-        }
-        return Some(
-            possible
-                .iter()
-                .map(|&c| (c.trailing_zeros() as usize))
-                .collect(),
-        );
+    fn grid_from_possible(&self, possible: &[usize]) -> Option<Vec<usize>> {
+        return possible
+            .iter()
+            .map(|&c| {
+                if c.is_power_of_two() {
+                    Some(c.trailing_zeros() as usize)
+                } else {
+                    None
+                }
+            })
+            .collect();
     }
 
     fn eliminate(&mut self, possible: &mut [usize], first_pos: usize, first_val: usize) -> bool {
@@ -136,16 +136,22 @@ impl SudokuSolver {
         }
     }
 
-    pub fn solve(&mut self, possible: &[usize]) -> Option<Vec<usize>> {
+    pub fn solve(&mut self, grid: &[usize]) -> Option<Vec<usize>> {
+        let possible = self.possible_from_grid(grid);
+        let maybe_solution = self._solve(&possible);
+        maybe_solution.map(|solution| self.grid_from_possible(&solution).unwrap())
+    }
+
+    fn _solve(&mut self, possible: &[usize]) -> Option<Vec<usize>> {
         // Get the cell with the lowest number of possibilites, to guess from.
-        let min_pos = get_min_pos(possible);
+        let min_pos = self.get_min_pos(possible);
 
         if let Some(min_pos) = min_pos {
             for power in possible[min_pos].iter_bits() {
                 let mut possible_copy = possible.to_owned();
                 // Remove that value, and continue to recursively solve if that works.
                 if self.eliminate(&mut possible_copy, min_pos, power) {
-                    if let Some(x) = self.solve(&possible_copy) {
+                    if let Some(x) = self._solve(&possible_copy) {
                         // Keep passing the solution back along
                         return Some(x);
                     }
@@ -159,7 +165,13 @@ impl SudokuSolver {
         }
     }
 
-    pub fn solve_random(&mut self, possible: &[usize]) -> Option<Vec<usize>> {
+    pub fn solve_random(&mut self, grid: &[usize]) -> Option<Vec<usize>> {
+        let possible = self.possible_from_grid(grid);
+        let maybe_solution = self._solve_random(&possible);
+        maybe_solution.map(|solution| self.grid_from_possible(&solution).unwrap())
+    }
+
+    fn _solve_random(&mut self, possible: &[usize]) -> Option<Vec<usize>> {
         // Get the cell with the lowest number of possibilites, to guess from.
         let min_pos = self.get_min_pos_rand(possible);
 
@@ -170,7 +182,7 @@ impl SudokuSolver {
                 let mut possible_copy = possible.to_owned();
                 // Remove that value, and continue to recursively solve if that works.
                 if self.eliminate(&mut possible_copy, min_pos, power) {
-                    if let Some(x) = self.solve(&possible_copy) {
+                    if let Some(x) = self._solve_random(&possible_copy) {
                         // Keep passing the solution back along
                         return Some(x);
                     }
@@ -184,15 +196,16 @@ impl SudokuSolver {
         }
     }
 
-    pub fn is_valid_puzzle(&mut self, possible: &[usize]) -> bool {
-        self._is_valid_puzzle(possible, 0) == 1
+    pub fn is_valid_puzzle(&mut self, grid: &[usize]) -> bool {
+        let possible = self.possible_from_grid(grid);
+        self._is_valid_puzzle(&possible, 0) == 1
     }
 
     /// Returns 0 if there are no solutions, 1 if there a single solution,
     /// and 2 if there is more than 1 solution.
     fn _is_valid_puzzle(&mut self, possible: &[usize], mut count: usize) -> usize {
         // Get the cell with the lowest number of possibilites, to guess from.
-        let min_pos = get_min_pos(possible);
+        let min_pos = self.get_min_pos(possible);
 
         if let Some(min_pos) = min_pos {
             for power in possible[min_pos].iter_bits() {
@@ -221,11 +234,11 @@ impl SudokuSolver {
             .filter(|&elem| !possible[elem].is_power_of_two())
             .min_by_key(|&elem| possible[elem].count_ones())
     }
-}
 
-fn get_min_pos(possible: &[usize]) -> Option<usize> {
-    (0..81)
-        .into_iter()
-        .filter(|&elem| !possible[elem].is_power_of_two())
-        .min_by_key(|&elem| possible[elem].count_ones())
+    fn get_min_pos(&self, possible: &[usize]) -> Option<usize> {
+        (0..81)
+            .into_iter()
+            .filter(|&elem| !possible[elem].is_power_of_two())
+            .min_by_key(|&elem| possible[elem].count_ones())
+    }
 }
