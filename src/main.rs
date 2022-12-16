@@ -52,8 +52,23 @@ fn main() {
                 Err(error) => println!("{}", error),
             }
         }
-        Commands::Check(_args) => {
-            todo!();
+        Commands::Check(args) => {
+            let mut solver = Solver::new();
+
+            match string_to_grid(&args.sudoku) {
+                Ok(grid) => {
+                    if grid.iter().any(|&cell| cell == 0) {
+                        println!("Invalid: not all cells filled in");
+                        return
+                    }
+
+                    match solver.solve(&grid) {
+                        Some(_solved) => println!("Valid"),
+                        None => println!("Invalid: solved incorrectly")
+                    }
+                }
+                Err(error) => println!("Invalid: {}", error)
+            }
         }
         Commands::Generate(args) => {
             let mut generator = Generator::new();
