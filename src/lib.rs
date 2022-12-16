@@ -213,7 +213,7 @@ mod tests {
     use crate::{
         generator::SudokuGenerator, grid_to_string, solver::SudokuSolver, utils::string_to_grid,
     };
-    use test::{Bencher, black_box};
+    use test::{black_box, Bencher};
 
     #[test]
     fn test_solver() {

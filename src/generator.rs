@@ -1,6 +1,6 @@
 use std::iter::zip;
 
-use rand::{seq::SliceRandom};
+use rand::seq::SliceRandom;
 
 use crate::solver::SudokuSolver;
 
@@ -17,7 +17,7 @@ impl Default for SudokuGenerator {
 impl SudokuGenerator {
     pub fn new() -> Self {
         Self {
-            solver: SudokuSolver::new()
+            solver: SudokuSolver::new(),
         }
     }
 

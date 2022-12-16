@@ -59,15 +59,15 @@ fn main() {
                 Ok(grid) => {
                     if grid.iter().any(|&cell| cell == 0) {
                         println!("Invalid: not all cells filled in");
-                        return
+                        return;
                     }
 
                     match solver.solve(&grid) {
                         Some(_solved) => println!("Valid"),
-                        None => println!("Invalid: solved incorrectly")
+                        None => println!("Invalid: solved incorrectly"),
                     }
                 }
-                Err(error) => println!("Invalid: {}", error)
+                Err(error) => println!("Invalid: {}", error),
             }
         }
         Commands::Generate(args) => {
