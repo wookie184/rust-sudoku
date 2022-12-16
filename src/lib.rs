@@ -1,3 +1,6 @@
+#![feature(test)]
+extern crate test;
+
 mod constants;
 mod generator;
 mod solver;
@@ -8,7 +11,7 @@ pub use self::solver::SudokuSolver as Solver;
 pub use self::utils::{grid_to_string, string_to_grid};
 
 #[cfg(test)]
-mod test {
+mod tests {
     use std::iter::zip;
 
     pub const TEST_CASES: [&str; 95] = [
@@ -210,6 +213,7 @@ mod test {
     use crate::{
         generator::SudokuGenerator, grid_to_string, solver::SudokuSolver, utils::string_to_grid,
     };
+    use test::{Bencher, black_box};
 
     #[test]
     fn test_solver() {
@@ -258,5 +262,15 @@ mod test {
                 assert!(!solver.is_valid_puzzle(&sudoku));
             }
         }
+    }
+
+    #[bench]
+    fn bench_generator(b: &mut Bencher) {
+        b.iter(|| {
+            let mut generator = SudokuGenerator::with_seed(123);
+            for _ in 1..10 {
+                black_box(generator.generate_sudoku());
+            }
+        })
     }
 }

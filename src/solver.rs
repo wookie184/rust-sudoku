@@ -14,7 +14,7 @@ const ALL_POSSIBLE: usize = (2 << 9) - 2;
 pub struct SudokuSolver {
     // For efficiency, this is created once so it can be reused over different
     eliminate_stack: Vec<(usize, usize)>,
-    rng: StdRng,
+    pub rng: StdRng,
 }
 
 impl Default for SudokuSolver {
@@ -31,6 +31,13 @@ impl SudokuSolver {
             eliminate_stack: Vec::<(usize, usize)>::with_capacity(1000),
             //
             rng: StdRng::from_entropy(),
+        }
+    }
+
+    pub fn with_seed(seed: u64) -> Self {
+        Self {
+            eliminate_stack: Vec::<(usize, usize)>::with_capacity(1000),
+            rng: StdRng::seed_from_u64(seed),
         }
     }
 

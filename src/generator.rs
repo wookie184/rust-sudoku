@@ -1,12 +1,11 @@
 use std::iter::zip;
 
-use rand::{rngs::StdRng, seq::SliceRandom, SeedableRng};
+use rand::{seq::SliceRandom};
 
 use crate::solver::SudokuSolver;
 
 pub struct SudokuGenerator {
     solver: SudokuSolver,
-    rng: StdRng,
 }
 
 impl Default for SudokuGenerator {
@@ -17,10 +16,14 @@ impl Default for SudokuGenerator {
 
 impl SudokuGenerator {
     pub fn new() -> Self {
-        let solver = SudokuSolver::new();
         Self {
-            solver,
-            rng: StdRng::from_entropy(),
+            solver: SudokuSolver::new()
+        }
+    }
+
+    pub fn with_seed(seed: u64) -> Self {
+        Self {
+            solver: SudokuSolver::with_seed(seed),
         }
     }
 
@@ -45,7 +48,7 @@ impl SudokuGenerator {
         let mut question = self.solver.solve_random(&vec![0; 81]).unwrap();
 
         let mut to_remove: Vec<usize> = (0..81).collect();
-        to_remove.shuffle(&mut self.rng);
+        to_remove.shuffle(&mut self.solver.rng);
 
         let mut chunk_size = 15;
 
