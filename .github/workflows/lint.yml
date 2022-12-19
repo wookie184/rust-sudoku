@@ -1,4 +1,4 @@
-name: Lint
+name: Lint and test
 
 on:
   push:
@@ -10,19 +10,20 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  runs-on: ubuntu-latest
+  lint-test:
+    runs-on: ubuntu-latest
 
-  steps:
-    - uses: actions/checkout@v3
+    steps:
+      - uses: actions/checkout@v3
 
-    - name: Run formatter 
-      run: cargo fmt --check --verbose
+      - name: Run formatter 
+        run: cargo fmt --check --verbose
 
-    - name: Run linter
-      run: cargo clippy --verbose
+      - name: Run linter
+        run: cargo clippy --verbose
 
-    - name: Build 
-      run: cargo build --verbose
+      - name: Build 
+        run: cargo build --verbose
 
-    - name: Run tests
-      run: cargo test --verbose
+      - name: Run tests
+        run: cargo test --verbose
