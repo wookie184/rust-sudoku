@@ -56,19 +56,20 @@ impl SudokuGenerator {
             // Take `chunk` cells from the end to remove them.
             let chunk: Vec<usize> = to_remove.iter().rev().take(chunk_size).copied().collect();
 
-            // TODO: improve/remove these funky heuristics
+            // Heuristics to try and remove multiple cells at once.
             if self.try_remove(&mut question, &chunk) || chunk_size == 1 {
                 to_remove.truncate(to_remove.len() - chunk_size);
 
                 if chunk_size == 1 {
                     if to_remove.len() >= 60 {
-                        chunk_size = 10;
-                    } else if to_remove.len() >= 50 {
-                        chunk_size = 5;
+                        chunk_size = 8;
+                    }
+                    else if to_remove.len() >= 40 {
+                        chunk_size = 4;
                     }
                 }
             } else {
-                chunk_size /= 4;
+                chunk_size /= 2;
                 if chunk_size <= 2 {
                     chunk_size = 1;
                 }
@@ -77,12 +78,12 @@ impl SudokuGenerator {
         question
     }
 
-    pub fn generate_sudoku_with_empty(&mut self, empty_cells: usize) -> Vec<usize> {
+    pub fn generate_sudoku_with_empty(&mut self, min_empty: usize, max_empty: usize) -> Vec<usize> {
         loop {
             let sudoku = self.generate_sudoku();
 
             let empty_count = sudoku.iter().filter(|&&c| c == 0).count();
-            if empty_count == empty_cells {
+            if min_empty <= empty_count && empty_count <= max_empty {
                 return sudoku;
             }
         }

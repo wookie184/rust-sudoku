@@ -226,6 +226,27 @@ mod tests {
     }
 
     #[test]
+    fn test_is_sudoku_valid() {
+        let mut solver = SudokuSolver::new();
+
+        assert_eq!(
+            solver.is_valid_puzzle(&string_to_grid(
+                "400000805030000000000700000020000060000080400000010000000603070500200000104000000"
+            ).unwrap()), true
+        );
+        assert_eq!(
+            solver.is_valid_puzzle(&string_to_grid(
+                "400000805030000000000700000020000000000080400000010000000603070500200000104000000"
+            ).unwrap()), false
+        );
+        assert_eq!(
+            solver.is_valid_puzzle(&string_to_grid(
+                "400000805030000000000700000020000060000080400000020000000603070500200000104000000"
+            ).unwrap()), false
+        );
+    }
+
+    #[test]
     fn test_generator_valid_puzzle() {
         let mut generator = SudokuGenerator::new();
         let mut solver = SudokuSolver::new();
@@ -241,7 +262,7 @@ mod tests {
         let mut generator = SudokuGenerator::new();
 
         for n in 55..60 {
-            let sudoku = generator.generate_sudoku_with_empty(n);
+            let sudoku = generator.generate_sudoku_with_empty(n, n);
             assert_eq!(sudoku.iter().filter(|&&c| c == 0).count(), n);
         }
     }
@@ -266,11 +287,25 @@ mod tests {
 
     #[bench]
     fn bench_generator(b: &mut Bencher) {
+        let mut generator = SudokuGenerator::with_seed(0);
         b.iter(|| {
-            let mut generator = SudokuGenerator::with_seed(123);
-            for _ in 1..10 {
-                black_box(generator.generate_sudoku());
-            }
-        })
+            black_box(generator.generate_sudoku());
+        });
+    }
+
+    #[bench]
+    fn bench_generator2(b: &mut Bencher) {
+        let mut generator = SudokuGenerator::with_seed(1);
+        b.iter(|| {
+            black_box(generator.generate_sudoku());
+        });
+    }
+
+    #[bench]
+    fn bench_generator3(b: &mut Bencher) {
+        let mut generator = SudokuGenerator::with_seed(2);
+        b.iter(|| {
+            black_box(generator.generate_sudoku());
+        });
     }
 }

@@ -8,11 +8,10 @@ use crate::{
 // Constant representing a cell that could be all of the possible values.
 // Each bit represents a possible digit. This is equivalent to: 0b1111111110
 // Where each bit corresponds to the following digits:            987654321
-// The last bit must always be 0 (this allows).
 const ALL_POSSIBLE: usize = (2 << 9) - 2;
 
 pub struct SudokuSolver {
-    // For efficiency, this is created once so it can be reused over different
+    // For efficiency, this is created once so it can be reused over different solves
     eliminate_stack: Vec<(usize, usize)>,
     pub rng: StdRng,
 }
@@ -26,10 +25,7 @@ impl Default for SudokuSolver {
 impl SudokuSolver {
     pub fn new() -> Self {
         Self {
-            // To avoid multiple unnecessary reallocations, choose a sensible
-            // inital capacity for the solver.
             eliminate_stack: Vec::<(usize, usize)>::with_capacity(1000),
-            //
             rng: StdRng::from_entropy(),
         }
     }
@@ -56,8 +52,7 @@ impl SudokuSolver {
         let mut possible = Vec::with_capacity(81);
         for i in 0..81 {
             if grid[i] == 0 {
-                // Calculate possible values with a quick
-                // search over neighbours.
+                // Calculate possible values with a quick search over neighbours.
                 possible.push(
                     ALL_POSSIBLE
                         & !PEER_INDICES[i]
@@ -96,51 +91,48 @@ impl SudokuSolver {
             self.eliminate_stack.push((first_pos, power));
         }
 
-        loop {
-            if let Some((pos, val)) = self.eliminate_stack.pop() {
-                debug_assert_ne!(possible[pos], 1);
+        while let Some((pos, val)) = self.eliminate_stack.pop() {
+            debug_assert_ne!(possible[pos] & 1, 1);
 
-                // Assert that the value wasn't already eliminated
-                if (val & possible[pos]) == 0 {
-                    continue;
-                }
+            // Assert that the value wasn't already eliminated
+            if (val & possible[pos]) == 0 {
+                continue;
+            }
 
-                // Eliminate the value
-                possible[pos] -= val;
+            // Eliminate the value
+            possible[pos] -= val;
 
-                if possible[pos] == 0 {
-                    // There are no possible values for this cell, meaning the guess was incorrect.
-                    return false;
-                } else if possible[pos].is_power_of_two() {
-                    // The value has been found, eliminate all neighbour cells.
-                    self.eliminate_stack.extend(
-                        PEER_INDICES[pos]
-                            .iter()
-                            .map(|peer_pos| (*peer_pos, possible[pos])),
-                    );
-                }
+            if possible[pos] == 0 {
+                // There are no possible values for this cell, meaning the guess was incorrect.
+                return false;
+            } else if possible[pos].is_power_of_two() {
+                // The value has been found, eliminate all neighbour cells.
+                self.eliminate_stack.extend(
+                    PEER_INDICES[pos]
+                        .iter()
+                        .map(|peer_pos| (*peer_pos, possible[pos])),
+                );
+            }
 
-                // For each shared column, row, and cell index
-                for unit in UNIT_INDICES[pos] {
-                    // Create an iterator of neighbours that could be `val`
-                    let mut iterator = unit.iter().filter(|&&peer| (val & possible[peer]) != 0);
+            // For each shared column, row, and cell index
+            for unit in UNIT_INDICES[pos] {
+                // Create an iterator of neighbours that could be `val`
+                let mut iterator = unit.iter().filter(|&&peer| (val & possible[peer]) != 0);
 
-                    // If there is only one, assign it. If there are none, it is an impossible
-                    // condition.
-                    if let Some(&first) = iterator.next() {
-                        if iterator.next().is_none() {
-                            for power in (possible[first] - val).iter_bits() {
-                                self.eliminate_stack.push((first, power));
-                            }
+                // If there is only one, assign it. If there are none, it is an impossible
+                // condition.
+                if let Some(&first) = iterator.next() {
+                    if iterator.next().is_none() {
+                        for power in (possible[first] - val).iter_bits() {
+                            self.eliminate_stack.push((first, power));
                         }
-                    } else {
-                        return false;
                     }
+                } else {
+                    return false;
                 }
-            } else {
-                return true;
             }
         }
+        true
     }
 
     pub fn solve(&mut self, grid: &[usize]) -> Option<Vec<usize>> {
