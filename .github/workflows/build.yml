@@ -29,5 +29,7 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: sudoku-${{ env.GITHUB_SHA }}-${{ matrix.target }}
-        path: target/${{ matrix.target }}/release/sudoku
+        name: sudoku-${{ matrix.target }}
+        path: 
+          target/${{ matrix.target }}/release/sudoku
+          target/${{ matrix.target }}/release/sudoku.exe
