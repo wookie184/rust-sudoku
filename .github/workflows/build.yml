@@ -20,16 +20,24 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Add target
-      run: rustup target add ${{ matrix.target }}
+    - name: Install latest nightly
+      uses: actions-rs/toolchain@v1
+      with:
+          toolchain: nightly
+          override: true
+          target: ${{ matrix.target }}
+          components: rustfmt, clippy
 
-    - name: Build
-      run: cargo build --release --verbose --target ${{ matrix.target }}
+    - uses: PyO3/maturin-action@v1
+      with:
+        command: build
+        working-directory: sudoku-python
+        args: --release
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
         name: sudoku-${{ matrix.target }}
         path: 
-          target/${{ matrix.target }}/release/sudoku
-          target/${{ matrix.target }}/release/sudoku.exe
+          sudoku-python/target/${{ matrix.target }}/release/sudoku
+          sudoku-python/target/${{ matrix.target }}/release/sudoku.exe
