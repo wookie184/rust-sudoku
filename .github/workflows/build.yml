@@ -39,5 +39,4 @@ jobs:
       with:
         name: sudoku-${{ matrix.target }}
         path: 
-          sudoku-python/target/${{ matrix.target }}/release/sudoku
-          sudoku-python/target/${{ matrix.target }}/release/sudoku.exe
+          sudoku-python/target/wheels/*
