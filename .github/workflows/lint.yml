@@ -16,14 +16,23 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Run formatter 
-        run: cargo fmt --check --verbose
+      - name: Install latest nightly
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: nightly
+            override: true
+            components: rustfmt, clippy
 
-      - name: Run linter
-        run: cargo clippy --verbose
+      - name: Format, lint, and test sudoku
+        working-directory: ./sudoku
+        run: |
+          cargo fmt --check --verbose
+          cargo clippy --verbose
+          cargo test --verbose
 
-      - name: Build 
-        run: cargo build --verbose
-
-      - name: Run tests
-        run: cargo test --verbose
+      - name: Format, lint, and test sudoku-python
+        working-directory: ./sudoku-python
+        run: |
+          cargo fmt --check --verbose
+          cargo clippy --verbose
+          cargo test --verbose

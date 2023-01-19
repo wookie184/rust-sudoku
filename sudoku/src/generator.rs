@@ -63,8 +63,7 @@ impl SudokuGenerator {
                 if chunk_size == 1 {
                     if to_remove.len() >= 60 {
                         chunk_size = 8;
-                    }
-                    else if to_remove.len() >= 40 {
+                    } else if to_remove.len() >= 40 {
                         chunk_size = 4;
                     }
                 }
