@@ -1,10 +1,11 @@
 use pyo3::prelude::*;
 
 #[pyclass]
+#[allow(clippy::upper_case_acronyms)]
 enum Difficulty {
-    Easy,
-    Medium,
-    Hard,
+    EASY,
+    MEDIUM,
+    HARD,
 }
 
 #[pyfunction]
@@ -17,10 +18,26 @@ fn generate_sudoku() -> Vec<usize> {
 fn generate_sudoku_with_difficulty(difficulty: &Difficulty) -> Vec<usize> {
     let mut generator = sudoku::Generator::new();
     match difficulty {
-        Difficulty::Easy => generator.generate_sudoku_with_empty(0, 55),
-        Difficulty::Medium => generator.generate_sudoku_with_empty(56, 57),
-        Difficulty::Hard => generator.generate_sudoku_with_empty(58, 81),
+        Difficulty::EASY => generator.generate_sudoku_with_empty(0, 55),
+        Difficulty::MEDIUM => generator.generate_sudoku_with_empty(56, 57),
+        Difficulty::HARD => generator.generate_sudoku_with_empty(58, 81),
     }
+}
+
+#[pyfunction]
+fn is_solved_sudoku(grid: Vec<usize>) -> bool {
+    if grid.len() != 81 {
+        return false;
+    }
+    if !grid.iter().all(|&n| (0..=9).contains(&n)) {
+        return false;
+    }
+    let mut solver = sudoku::Solver::new();
+
+    if solver.is_valid_puzzle(&grid) {
+        return true;
+    }
+    false
 }
 
 #[pymodule]
@@ -29,5 +46,6 @@ fn sudoku_python(_py: Python, m: &PyModule) -> PyResult<()> {
 
     m.add_class::<Difficulty>()?;
     m.add_function(wrap_pyfunction!(generate_sudoku_with_difficulty, m)?)?;
+    m.add_function(wrap_pyfunction!(is_solved_sudoku, m)?)?;
     Ok(())
 }
