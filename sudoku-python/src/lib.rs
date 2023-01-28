@@ -29,7 +29,7 @@ fn is_solved_sudoku(grid: Vec<usize>) -> bool {
     if grid.len() != 81 {
         return false;
     }
-    if !grid.iter().all(|&n| (0..=9).contains(&n)) {
+    if !grid.iter().all(|&n| (1..=9).contains(&n)) {
         return false;
     }
     let mut solver = sudoku::Solver::new();
