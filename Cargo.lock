@@ -392,8 +392,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "sudoku-python"
-version = "1.1.0"
+name = "sudokutils"
+version = "1.1.1-beta.0"
 dependencies = [
  "pyo3",
  "rand",

@@ -1,3 +1,6 @@
-# rust-sudoku
+# sudokutils
 
-A sudoku solver and generator
+Utilities for working with sudokus, including:
+- A solver
+- A generator
+- A validator

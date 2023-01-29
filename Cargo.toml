@@ -1,18 +1,18 @@
 [package]
-name = "sudoku-python"
-version = "1.1.0"
+name = "sudokutils"
+version = "1.1.1-beta.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-name = "sudoku_python"
+name = "sudokutils"
 # "cdylib" is necessary to produce a shared library for Python to import from.
 crate-type = ["cdylib"]
 
 [dependencies]
 rand = "0.8.4"
-sudoku = { path= "../sudoku" }
+sudoku = { path= "./sudoku" }
 
 [dependencies.pyo3]
 version = "0.17.3"

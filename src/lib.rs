@@ -41,7 +41,7 @@ fn is_solved_sudoku(grid: Vec<usize>) -> bool {
 }
 
 #[pymodule]
-fn sudoku_python(_py: Python, m: &PyModule) -> PyResult<()> {
+fn sudokutils(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(generate_sudoku, m)?)?;
 
     m.add_class::<Difficulty>()?;
